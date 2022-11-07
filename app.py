@@ -1,13 +1,11 @@
-import migrate as migrate
 from flask import Flask, render_template, request, redirect, url_for
-from flask_migrate import Migrate
 from models import User, db
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:12345678@localhost:5432/history"
 db.init_app(app)
-migrate = Migrate(app, db)
 
-
+with app.app_context():
+    db.create_all()
 @app.route('/')
 def index():  # put application's code here
     return render_template('index.html')
@@ -23,7 +21,7 @@ def price():
     return render_template('price.html')
 
 
-@app.route('/sign')
+@app.route('/sign', methods=["GET", "POST"])
 def sign():
     if request.method == "POST":
         email = request.form['email']
@@ -48,5 +46,4 @@ def login():
 
 
 if __name__ == '__main__':
-    db.create_all()
     app.run()
